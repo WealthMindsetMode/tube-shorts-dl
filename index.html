@@ -1,36 +1,90 @@
-<script>
-  async function downloadShort() {
-    const url = document.getElementById("videoUrl").value;
-    const result = document.getElementById("result");
-    const error = document.getElementById("error");
-    result.innerHTML = '';
-    error.textContent = '';
 
-    console.log("Download function triggered");
-
-    if (!url.includes("youtube.com/shorts")) {
-      error.textContent = "Please enter a valid YouTube Shorts URL.";
-      return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TubeShortsDL - YouTube Shorts Downloader</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
     }
+    h1 {
+      color: #222;
+      font-size: 2rem;
+    }
+    input {
+      width: 100%;
+      max-width: 600px;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      border: none;
+      background-color: #ff4141;
+      color: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    #error {
+      color: red;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>TubeShortsDL</h1>
+  <p>Paste any YouTube Shorts link below to download instantly.</p>
+  <input type="text" id="videoUrl" placeholder="Enter YouTube Shorts URL..." />
+  <button onclick="downloadShort()">Download</button>
 
-    try {
-      const response = await fetch('/api/download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url })
-      });
+  <div id="result"></div>
+  <div id="error"></div>
 
-      console.log("Response received:", response);
+  <script>
+    async function downloadShort() {
+      const url = document.getElementById("videoUrl").value;
+      const result = document.getElementById("result");
+      const error = document.getElementById("error");
+      result.innerHTML = '';
+      error.textContent = '';
 
-      const data = await response.json();
-      if (data.downloadUrl) {
-        result.innerHTML = `<p>Video ready:</p><a href="${data.downloadUrl}" target="_blank">Click to Download</a>`;
-      } else {
-        error.textContent = data.error || "Failed to retrieve video.";
+      if (!url.includes("youtube.com/shorts")) {
+        error.textContent = "Please enter a valid YouTube Shorts URL.";
+        return;
       }
-    } catch (err) {
-      console.error("Download error:", err);
-      error.textContent = "Something went wrong. Try again.";
+
+      try {
+        const response = await fetch('/api/download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+
+        const data = await response.json();
+        if (data.downloadUrl) {
+          result.innerHTML = `<p>Video ready:</p><a href="\${data.downloadUrl}" target="_blank">Click to Download</a>`;
+        } else {
+          error.textContent = data.error || "Failed to retrieve video.";
+        }
+      } catch (err) {
+        error.textContent = "Something went wrong. Try again.";
+      }
     }
-  }
-</script>
+  </script>
+</body>
+</html>
