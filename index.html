@@ -56,7 +56,8 @@
   <div id="error"></div>
 
   <script>
-    async function downloadShort() {
+    async function downloadShort() 
+    console.log("Download function triggered");
       const url = document.getElementById("videoUrl").value;
       const result = document.getElementById("result");
       const error = document.getElementById("error");
@@ -69,7 +70,7 @@
       }
 
       try {
-        const response = await fetch('/api/download', {
+        const response = await fetch console.log("Response received:", response);'/api/download', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url })
