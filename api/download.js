@@ -1,4 +1,3 @@
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -10,20 +9,25 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid YouTube Shorts URL' });
   }
 
+  const encodedUrl = encodeURIComponent(url);
+  const apiUrl = `https://youtube-shorts-downloader1.p.rapidapi.com/download?url=${encodedUrl}`;
+
   try {
-    // Using a proxy downloader API (placeholder)
-    const apiUrl = `https://api.vevioz.com/api/button/mp3?url=${encodeURIComponent(url)}`;
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'X-RapidAPI-Key': '45e5a53a7dmshff265f1aac87f9bp131b90jsn0d6ab0da2ff4,
+        'X-RapidAPI-Host': 'youtube-shorts-downloader1.p.rapidapi.com'
+      }
+    });
 
-    const response = await fetch(apiUrl);
-    const html = await response.text();
+    const data = await response.json();
 
-    const match = html.match(/href="(https:\/\/[^"]+\.mp4[^"]*)"/);
-    if (!match || !match[1]) {
+    if (!data.download || !data.download.url) {
       return res.status(400).json({ error: 'Video download link not found' });
     }
 
-    const downloadUrl = match[1].replace(/&amp;/g, "&");
-    return res.status(200).json({ downloadUrl });
+    return res.status(200).json({ downloadUrl: data.download.url });
   } catch (err) {
     console.error('Download error:', err);
     return res.status(500).json({ error: 'Failed to fetch download link' });
